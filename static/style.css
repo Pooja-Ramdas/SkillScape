@@ -30,10 +30,11 @@
     z-index: -1; /* Place canvas behind other UI elements */
 }
 
-body {
+body, html {
     margin: 0;
     overflow: hidden; /* Prevent scrolling */
     height: 100vh; /* Make sure body takes up full height */
+    width: 100vw;
 }
 
 /* Ensure the UI elements like header and buttons are above the canvas */
