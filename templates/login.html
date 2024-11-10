@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Logo styling */
+        .logo-container {
+            position: absolute;
+            top: 10px;
+            left: 125px;
+            z-index: 1000;  /* Ensure the logo is on top of other content */
+        }
+        .logo {
+            width: 150px; /* Adjust size as per your logo */
+            height: auto;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        
+        /* Canvas Background */
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            z-index: -1;
+            background-color: black;
+        }
+        
+        /* Centering Login Box */
+        .login-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            width: 400px;
+            height: 400px;
+            color: white;
+            z-index: 1;
+        }
+        
+        /* Logo Placeholder */
+        .logo-text {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 100px;
+            margin-bottom: 20px;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+        }
+        
+        /* Input Styles */
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+        
+        /* Button Styles */
+        .login-button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00ffd0;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        
+        .login-button:hover {
+            background-color: #00e6b8;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas for Three.js Background -->
+    <canvas id="background"></canvas>
+
+    <!-- Login Box -->
+    <div class="login-container">
+        <div class="logo-container">
+            <img src="C:\Users\pooja\Downloads\finalskillscape.png" alt="SkillScape Logo" class="logo">
+        </div>
+        <div class="logo-text">Login to SkillScape</div>
+        <input type="text" class="input-field" placeholder="Username">
+        <input type="password" class="input-field" placeholder="Password">
+        <button class="login-button">Login</button>
+    </div>
+
+    <!-- Three.js and Script for Background Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up Three.js Scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('background'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Create Gradient Shader Material
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                vec3 pos = position;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+            }
+        `;
+        const fragmentShader = `
+            uniform vec2 u_resolution;
+            uniform float u_time;
+            varying vec2 vUv;
+
+            void main() {
+                vec2 st = vUv;
+                vec2 center = vec2(0.5, 0.5);
+                
+                // Calculate distance from center
+                float distToCenter = distance(st, center);
+                
+                // Pulse effect using sine of time
+                float pulse = 0.5 + 0.5 * sin(u_time); // Ranges from 0 to 1
+
+                // Create a gradient that gradually fades to black
+                vec3 color = mix(vec3(0.0), vec3(0.0, 1.0, 0.8), pulse * (1.0 - smoothstep(0.0, 0.6, distToCenter)));
+                
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+        
+        const uniforms = {
+            u_mouse: { value: { x: window.innerWidth / 2, y: window.innerHeight / 2 } },
+            u_resolution: { value: { x: window.innerWidth, y: window.innerHeight } },
+            u_time: { value: 0.0 }
+        };
+        
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms
+        });
+
+        // Fullscreen Plane for Shader
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const plane = new THREE.Mesh(geometry, material);
+        scene.add(plane);
+
+        camera.position.z = 1;
+
+        // Animate the Scene
+        function animate() {
+            uniforms.u_time.value += 0.01; // Adjust for pulsing speed
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Adjust on Window Resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.u_resolution.value.x = window.innerWidth;
+            uniforms.u_resolution.value.y = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

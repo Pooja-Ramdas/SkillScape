@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillScape</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.139.2/build/three.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+></script> <!-- Include Three.js library -->
+</head>
+<div class="logo-container">
+    <img src="C:\Users\pooja\Downloads\finalskillscape.png" alt="SkillScape Logo" class="logo">
+</div>
+
+<canvas id="shardsCanvas"></canvas>
+
+<!-- Header with menu on the right -->
+<header>
+    <nav class="menu">
+        <ul>
+            <li><a href="{{ url_for('login') }}">L O G I N</a></li>
+            <li><a href="{{ url_for('signup') }}">S I G N U P</a></li>
+            <li><a href="#about">A B O U T</a></li>
+            <li><a href="#contact">C O N T A C T</a></li>
+        </ul>
+    </nav>
+</header>
+    <main>
+        <h2 class="ui-container">Welcome to SkillScape</h2>
+        <p>Your personalized learning journey awaits.</p>
+
+        <!-- Start Learning Button -->
+        <a href="{{ url_for('signup') }}" class="start-learning-btn">START LEARNING</a>
+        
+        <div class="features">
+            <!-- Tile for Feature 1 -->
+            <div class="tile coral">
+                <i class="bi bi-people-fill"></i>
+                <h3>Personalized Learning Paths</h3>
+                <p>Get course recommendations based on your interests and goals.</p>
+            </div>
+        
+            <!-- Tile for Feature 2 -->
+            <div class="tile orange">
+                <i class="bi bi-person-check-fill"></i>
+                <h3>Skill-based Assessments</h3>
+                <p>Assess your skills and track your progress in real-time.</p>
+            </div>
+        
+            <!-- Tile for Feature 3 -->
+            <div class="tile yellow">
+                <i class="bi bi-graph-up-arrow"></i>
+                <h3>Data-Driven Insights</h3>
+                <p>Make informed decisions with personalized data insights.</p>
+            </div>
+        </div>
+        
+    </main>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

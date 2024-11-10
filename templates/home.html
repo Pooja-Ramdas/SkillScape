@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <style>
+        /* General body styling */
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 240px;
+            background-color: #034545;
+            color: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 40px;
+        }
+
+        .sidebar a {
+            color: #ffffff;
+            font-size: 16px;
+            margin: 10px 0;
+            text-decoration: none;
+            display: block;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #004d4d;
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .welcome {
+            font-size: 28px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Grid styling for tiles */
+        .grid {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .tile {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+        }
+
+        .tile h3 {
+            font-size: 20px;
+            color: #006666;
+            margin-bottom: 10px;
+        }
+
+        .tile img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        /* Specific tile colors */
+        .roadmap { background-color: #ffb342; }
+        .certificates { background-color: #ffd700; }
+        .skills { background-color: #ff876676; }
+        .recommended { background-color: #96fff49d; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Dashboard</h2>
+        <a href="#"><i class="bi bi-house-door-fill"></i> Home</a>
+        <a href="#"><i class="bi bi-book-fill"></i> Courses</a>
+        <a href="#"><i class="bi bi-award-fill"></i> Certificates</a>
+        <a href="#"><i class="bi bi-gear-fill"></i> Settings</a>
+        <a href="#"><i class="bi bi-info-circle-fill"></i> About</a>
+        <a href="#"><i class="bi bi-envelope-fill"></i> Contact</a>
+        <a href="index.html"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="welcome">Welcome, [Student Name]</div>
+        
+        <!-- Grid Layout -->
+        <div class="grid">
+            <!-- Recommended Courses Tile -->
+            <div class="tile recommended">
+                <h3>Recommended Courses</h3>
+                <img src="https://via.placeholder.com/150" alt="Course Image">
+                <p>Intro to Programming</p>
+            </div>
+
+            <!-- Roadmap Tile -->
+            <div class="tile roadmap">
+                <h3>Prep Strategy</h3>
+                <p>Get personalized study plans and checklists.</p>
+            </div>
+
+            <!-- Certificates Tile -->
+            <div class="tile certificates">
+                <h3>My Certificates</h3>
+                <p>View and download your earned certificates.</p>
+            </div>
+
+            <!-- Skills Tile -->
+            <div class="tile skills">
+                <h3>My Skills</h3>
+                <p>Review and track your skill progress.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
