@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | SkillScape</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Helvetica, sans-serif; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 500px; margin: 50px auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        h1 { color: #444; text-align: center; }
+        label { color: #666; font-weight: bold; }
+        .form-group { margin-bottom: 20px; }
+        .btn { background-color: #444; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn:hover { background-color: #333; }
+        .icon { margin-right: 8px; color: #888; }
+        .feedback { margin-top: 15px; color: #d9534f; }
+
+        #deleteAccount {
+    background-color: #d9534f;  /* Bootstrap's "danger" red color */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+#deleteAccount .icon {
+    margin-right: 8px;
+    color: white;
+}
+
+#deleteAccount:hover {
+    background-color: #c9302c;  /* Darker shade for hover effect */
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="bi bi-gear-fill icon"></i> Settings</h1>
+        <form id="settingsForm" action="/update_settings" method="POST">
+            <div class="form-group">
+                <label for="username"><i class="bi bi-person icon"></i>Username</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="bi bi-lock icon"></i>New Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn"><i class="bi bi-save icon"></i>Save Changes</button>
+            </div>
+            <div class="form-group">
+                <button type="button" id="deleteAccount" class="btn" style="background-color: #d9534f;">
+                    <i class="bi bi-trash icon"></i>Delete Account
+                </button>
+            </div>            
+        </form>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <script>
+        document.getElementById("settingsForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            const feedback = document.getElementById("feedback");
+            feedback.innerText = "";
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            const response = await fetch('/update_settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+            feedback.innerText = result.message;
+        });
+
+        document.getElementById("deleteAccount").addEventListener("click", async function() {
+            const confirmation = confirm("Are you sure you want to delete your account? This action cannot be undone.");
+            if (!confirmation) return;
+
+            const response = await fetch('/delete_account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            if (response.ok) window.location.href = '/signup'; // Redirect after deletion
+        });
+
+    </script>
+</body>
+</html>

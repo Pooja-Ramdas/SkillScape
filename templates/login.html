@@ -49,6 +49,7 @@
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.7);
             padding: 40px;
+            padding-bottom: 50px;
             border-radius: 10px;
             text-align: center;
             width: 400px;
@@ -74,12 +75,13 @@
         .input-field {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
+            margin-top: 10px;
             border: none;
             border-radius: 5px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
             font-size: 16px;
+            margin-bottom: 20px;
         }
         
         /* Button Styles */
@@ -92,6 +94,8 @@
             color: black;
             font-size: 16px;
             cursor: pointer;
+            text-decoration: none;
+            margin-top: 20px;
             transition: transform 0.3s ease, background-color 0.3s ease;
         }
         
@@ -111,9 +115,13 @@
             <img src="{{ url_for('static', filename='images/finalskillscape.png') }}" alt="SkillScape Logo" class="logo">
         </div>
         <div class="logo-text">Login to SkillScape</div>
-        <input type="text" class="input-field" placeholder="Username">
-        <input type="password" class="input-field" placeholder="Password">
-        <button class="login-button">Login</button>
+        
+        <!-- Form for login credentials -->
+        <form action="{{ url_for('login') }}" method="POST">
+            <input type="text" class="input-field" placeholder="Username" name="username" required>
+            <input type="password" class="input-field" placeholder="Password" name="password" required>
+            <button type="submit" class="login-button">Login</button>
+        </form>
     </div>
 
     <!-- Three.js and Script for Background Animation -->

@@ -4,29 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
     <style>
-        /* General body styling */
         body {
-            font-family: Helvetica, Arial, sans-serif;
+            font-family: Helvetica, sans-serif;
             margin: 0;
             display: flex;
             height: 100vh;
             overflow: hidden;
-            background-color: #f4f4f4;
+            background-color: #b4c4e6;
             color: #333;
         }
 
         /* Sidebar styling */
         .sidebar {
             width: 240px;
-            background-color: #034545;
+            background-color: #000000;
             color: #ffffff;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%); /* Hide sidebar initially */
+            transition: transform 0.3s ease;
+            z-index: 1000; /* Ensure sidebar is above other elements */
+        }
+
+        /* Sidebar visible class */
+        .sidebar.active {
+            transform: translateX(0); /* Show sidebar */
         }
 
         .sidebar h2 {
@@ -46,28 +55,39 @@
         }
 
         .sidebar a:hover {
-            background-color: #004d4d;
+            background-color: #001b1b;
         }
 
-        /* Main content area */
+        .menu-icon {
+            font-size: 24px;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: #034545;
+            z-index: 1001;
+        }
+
         .main-content {
             flex: 1;
             padding: 40px;
+            margin-left: 60px;
             overflow-y: auto;
+            width: 100%;
         }
 
         .welcome {
-            font-size: 28px;
-            font-weight: 500;
-            color: #333;
+            font-size: 40px;
+            font-weight: bolder;
+            color: #000000;
             margin-bottom: 20px;
         }
 
-        /* Grid styling for tiles */
         .grid {
             display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
             gap: 20px;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
         .tile {
@@ -82,72 +102,390 @@
             transform: translateY(-5px);
         }
 
-        .tile h3 {
-            font-size: 20px;
-            color: #006666;
-            margin-bottom: 10px;
+        /* Specific tile styles for puzzle layout */
+        .analytics {
+            grid-column: span 1;
+            background-color: #ffffcc;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .tile img {
+        .roadmap { background-color: #fff8e1; }
+        .certificates { background-color: #e8f5e9; }
+        .skills { 
+            background-color: #e1f5fe;
+            grid-column: span 2;
+
+        }
+
+        /* Canvas styling for chart */
+        #completionChart {
             width: 100%;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            height: 100%;
         }
 
-        /* Specific tile colors */
-        .roadmap { background-color: #ffb342; }
-        .certificates { background-color: #ffd700; }
-        .skills { background-color: #ff876676; }
-        .recommended { background-color: #96fff49d; }
+        /* Timeline Styling */
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+            padding: 0 20px;
+            border-left: 2px solid #006666;
+        }
 
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -10px;
+            width: 12px;
+            height: 12px;
+            background-color: #006666;
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            font-size: 16px;
+            color: #333;
+        }
+
+         /* Calendar container styling for two months */
+         .calendar-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .calendar {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            width: 250px;
+            border-radius: 12px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-h {
+            font-family: Helvetica, sans-serif;
+            font-size: 24px;
+            font-weight: bolder;
+        }
+
+        /* Month title styling */
+        .month-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Grid for days */
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 5px;
+            width: 100%;
+        }
+
+        /* Individual day styling */
+        .day {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            background-color: #e0e0e0; /* Inactive (gray) */
+            transition: background-color 0.2s ease;
+        }
+
+        /* Active day - style for days with activity */
+        .day.active {
+            background-color: #4caf50; /* Green for active */
+        }
+
+        .day.inactive {
+            background-color: #e0e0e0; /* Gray for inactive */
+        }
+
+        .day.hover {
+            background-color: #8c8c8c; /* Darker gray on hover */
+        }
+
+        .day.active:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+
+        .month {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Dashboard</h2>
-        <a href="#"><i class="bi bi-house-door-fill"></i> Home</a>
-        <a href="#"><i class="bi bi-book-fill"></i> Courses</a>
-        <a href="#"><i class="bi bi-award-fill"></i> Certificates</a>
-        <a href="#"><i class="bi bi-gear-fill"></i> Settings</a>
-        <a href="#"><i class="bi bi-info-circle-fill"></i> About</a>
-        <a href="#"><i class="bi bi-envelope-fill"></i> Contact</a>
-        <a href="{{ url_for('index') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+    <div class="menu-icon" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
     </div>
 
-    <!-- Main content -->
-    <div class="main-content">
-        <div class="welcome">Welcome, [Student Name]</div>
-        
-        <!-- Grid Layout -->
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <h2>Dashboard</h2>
+            <a href="{{ url_for('index') }}"><i class="bi bi-house-door-fill"></i> Home</a>
+            <a href="{{ url_for('courses') }}"><i class="bi bi-book-fill"></i> Courses</a>
+            <a href="{{ url_for('certificates') }}"><i class="bi bi-award-fill"></i> Certificates</a>
+            <a href="{{ url_for('settings') }}"><i class="bi bi-gear-fill"></i> Settings</a>
+            <a href="{{ url_for('about') }}"><i class="bi bi-info-circle-fill"></i> About</a>
+            <a href="{{ url_for('contact') }}"><i class="bi bi-envelope-fill"></i> Contact</a>
+            <a href="{{ url_for('index') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+        </div>
+
+        <div class="main-content">
+            <div class="welcome">Welcome, {{ username }}</div> <!-- Display username here -->
+     
+
         <div class="grid">
-            <!-- Recommended Courses Tile -->
-            <div class="tile recommended">
-                <h3>Recommended Courses</h3>
-                <img src="https://via.placeholder.com/150" alt="Course Image">
-                <p>Intro to Programming</p>
+            <!-- Analytics Tile with Chart -->
+            <div class="tile analytics">
+                <canvas id="completionChart"></canvas>
             </div>
 
+            <!-- Other Tiles -->
             <!-- Roadmap Tile -->
             <div class="tile roadmap">
                 <h3>Prep Strategy</h3>
-                <p>Get personalized study plans and checklists.</p>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 1</div>
+                        <div class="timeline-content">Introduction to Basics</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 2</div>
+                        <div class="timeline-content">Data Structures Overview</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 3</div>
+                        <div class="timeline-content">Sorting and Searching Algorithms</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 4</div>
+                        <div class="timeline-content">Advanced Algorithm Concepts</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Week 5</div>
+                        <div class="timeline-content">Mock Tests and Revisions</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Certificates Tile -->
             <div class="tile certificates">
                 <h3>My Certificates</h3>
                 <p>View and download your earned certificates.</p>
             </div>
 
-            <!-- Skills Tile -->
             <div class="tile skills">
                 <h3>My Skills</h3>
                 <p>Review and track your skill progress.</p>
+                <div id="skills-chart" style="width: 100%; height: 300px;">
+                    <canvas id="skillsBarChart"></canvas>
+                </div>                
+            </div>
+
+            <!-- Days Active Tile (below Timeline and to the right of Skills Tile) -->
+    <div class="tile days-active-tile">
+        <div class="calendar-h">Days Active</div>
+        <div class="calendar">
+            <!-- Month Name -->
+            <div class="month-name">November 2024</div>
+            <!-- Calendar grid for days -->
+            <div class="days-grid">
+                <!-- Add the days of the month (you can customize this based on the month) -->
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day inactive"></div>
+                <div class="day active"></div>
+                <div class="day active"></div>
             </div>
         </div>
     </div>
+        </div>
+    </div>
 
+    <script>
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!sidebar.contains(event.target) && !event.target.closest('.menu-icon')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Course completion chart using Chart.js
+        const courseData = {
+            labels: ['Completed', 'In Progress', 'Not Started'],
+            datasets: [{
+                data: [60, 25, 15], // Course completion data
+                backgroundColor: ['#1e1447', '#FFC107', '#F44336'],
+                hoverOffset: 15
+            }]
+        };
+        // Custom plugin to draw text in the center of the doughnut chart
+        const centerTextPlugin = {
+            id: 'centerText',
+            beforeDraw: function(chart) {
+                const ctx = chart.ctx;
+                const chartArea = chart.chartArea;
+                const centerX = (chartArea.left + chartArea.right) / 2;
+                const centerY = (chartArea.top + chartArea.bottom) / 2;
+
+                // Customize the text
+                const text = "Great Progress!"; // Text to be displayed in the center
+                const fontSize = 24; // Font size for the text
+                ctx.save();
+                ctx.font = "bold " + fontSize + "px Arial Rounded MT Bold";
+                ctx.fillStyle = "#828282"; // Text color
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(text, centerX, centerY); // Draw the text
+                ctx.restore();
+            }
+        };
+
+        // Register the plugin with Chart.js
+        Chart.register(centerTextPlugin);
+
+        const config = {
+            type: 'doughnut',
+            data: courseData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.raw + '%';
+                                return label;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                },
+                cutout: '60%' 
+            }
+        };
+
+        const completionChart = new Chart(
+            document.getElementById('completionChart'),
+            config
+        );
+        
+    </script>
+    <script>
+        var ctx = document.getElementById('skillsBarChart').getContext('2d');
+    var skillsBarChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['JavaScript', 'Python', 'CSS', 'HTML', 'SQL'],
+        datasets: [{
+            label: 'Skill Proficiency',
+            data: [85, 90, 75, 95, 80], // Example skill data (percentage)
+            backgroundColor: [
+                '#8576c4', // Lavender
+                '#1e1447',  // Purple
+                '#8576c4', // Lavender
+                '#1e1447',  // Purple
+                '#8576c4'  // Lavender
+            ],
+            borderColor: [
+                'rgba(75, 0, 130, 1)', // Purple border
+                'rgba(75, 0, 130, 1)', // Purple border
+                'rgba(75, 0, 130, 1)', // Purple border
+                'rgba(75, 0, 130, 1)', // Purple border
+                'rgba(75, 0, 130, 1)'  // Purple border
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        animation: {
+            duration: 1500, // Duration of the animation
+            easing: 'easeInOutBounce' // Animation effect
+        },
+        plugins: {
+            title: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 10
+                }
+            }
+        }
+    }
+});
+
+    </script>
 </body>
 </html>

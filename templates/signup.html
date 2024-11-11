@@ -101,6 +101,13 @@
             background-color: #00e6b8;
             transform: scale(1.05);
         }
+
+        .error-message {
+            color: rgb(255, 96, 96);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -108,17 +115,28 @@
     <canvas id="background"></canvas>
 
     <!-- Sign Up Box -->
-    <div class="signup-container">
-        <div class="logo-container">
-            <img src="{{ url_for('static', filename='images/finalskillscape.png') }}" alt="SkillScape Logo" class="logo">
-        </div>
-        <div class="logo-text">Sign Up for SkillScape</div>
-        <input type="text" class="input-field" placeholder="Username">
-        <input type="email" class="input-field" placeholder="Email">
-        <input type="password" class="input-field" placeholder="Password">
-        <input type="password" class="input-field" placeholder="Confirm Password">
-        <a href="info.html" class="signup-button">Sign Up</a>
+<div class="signup-container">
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/finalskillscape.png') }}" alt="SkillScape Logo" class="logo">
     </div>
+    <div class="logo-text">Sign Up for SkillScape</div>
+    
+    <!-- Display error message if any -->
+    {% if error %}
+    <div class="error-message">{{ error }}</div>
+    {% endif %}
+
+    <!-- Form to collect user data -->
+         <form action="{{ url_for('signup') }}" method="POST">
+        <input type="text" class="input-field" name="username" placeholder="Username" required>
+        <input type="email" class="input-field" name="email" placeholder="Email" required>
+        <input type="password" class="input-field" name="password" placeholder="Password" required>
+        <input type="password" class="input-field" name="confirm_password" placeholder="Confirm Password" required>
+        <input type="tel" class="input-field" name="contact_number" placeholder="Contact Number" pattern="[0-9]{10}" required>
+        <button type="submit" class="signup-button">Sign Up</button>
+    </form>
+</div>
+
 
     <!-- Three.js and Script for Background Animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
